@@ -1,11 +1,12 @@
 `timescale 1ns / 1ps
 
-module tb_adder();
+module tb_sub_adder();
   reg a, b, cin;
-  wire s_ha, s_fa, cout_ha, cout_fa;
+  wire s_ha, s_fa, cout_ha, cout_fa, d, bout;
 
-half_adder ha0 (a, b, s_ha, cout_ha);
-full_adder fa0 (a, b, cin, s_fa, cout_fa);
+half_adder  ha0   (a, b, s_ha, cout_ha);
+full_adder  fa0   (a, b, cin, s_fa, cout_fa);
+full_sub    sub0  (a, b, cin, d, bout);
 
 initial begin
 // ___ initial value
@@ -37,7 +38,7 @@ end
 // ___ checker
 always @(a or b or cin) begin //ha
   #30;
-  if({cout_ha, s_ha} == a + b)
+  if({cout_ha, s_ha} == (a + b))
     $display("pass_ha\t\ta: %b\tb: %b\ts: %b\tcout: %b", a, b, s_ha, cout_ha);  
   else
     $display("__false_ha\t\ta: %b\tb: %b\ts: %b\tcout: %b_____", a, b, s_ha, cout_ha);
@@ -45,9 +46,18 @@ end
 
 always @(a or b or cin) begin //fa
   #30;
-  if({cout_fa, s_fa} == a + b + cin) 
+  if({cout_fa, s_fa} == (a + b + cin)) 
     $display("pass_fa\t\ta: %b\tb: %b\tcin: %b\ts: %b\tcout: %b", a, b, cin, s_fa, cout_fa);
   else
     $display("__false_fa\t\ta: %b\tb: %b\tcin: %b\ts: %b\tcout: %b_____", a, b, cin, s_fa, cout_fa);
 end
+
+always @(a or b or cin) begin //fs
+  #30;
+  if({bout, d} == (a - b - cin)) 
+    $display("pass_fs\t\ta: %b\tb: %b\tcin: %b\td: %b\tbout: %b", a, b, cin, d, bout);
+  else
+    $display("__false_fs\t\ta: %b\tb: %b\tcin: %b\td: %b\tbout: %b_____", a, b, cin, d, bout);
+end
+
 endmodule
